@@ -1,0 +1,4 @@
+# Path to the SentenceTransformer model directory
+SENTENCE_TRANSFORMER_MODEL=./models/paraphrase-MiniLM-L6-v2
+# Path to the HuggingFace summarization model directory
+SUMMARIZATION_MODEL=./models/bart-large-cnn 

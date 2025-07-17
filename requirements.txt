@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+PyMuPDF
+Pillow
+sentence-transformers
+transformers
+torch 
+dotenv
