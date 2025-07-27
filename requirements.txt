@@ -13,4 +13,6 @@ pydantic
 python-docx
 starlette
 PyPDF2
-# psycopg2-binary
+sqlalchemy 
+psycopg2-binary
+
