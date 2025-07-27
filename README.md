@@ -1,86 +1,104 @@
-# Conversational Document-Aware Chatbot
+# Conversational Document-Aware Chatbot (Modular FastAPI Edition)
 
-This project is a Python-based conversational bot that can understand user queries and provide context-aware answers based on the documents you provide. It leverages modern LLMs, semantic search, and vector databases to deliver accurate, document-grounded responses.
+This project is a modular, production-ready FastAPI chatbot that answers questions based on your documents. It supports persistent chat session history in PostgreSQL (viewable in pgAdmin), document ingestion, and vector search using ChromaDB.
+
+---
 
 ## Features
-- **Conversational AI:** Maintains context across turns for natural dialogue.
-- **Document Ingestion:** Supports ingestion of `.docx` and `.txt` files.
-- **Semantic Search:** Uses HuggingFace embeddings and ChromaDB for fast, relevant retrieval.
-- **Local LLM Support:** Can run with a local LLM (e.g., Llama) for offline or private deployments.
-- **Extensible:** Built with LangChain for easy extension to new file types, models, or vector stores.
+- **Modular FastAPI structure** for maintainability and scalability
+- **Document ingestion** (.txt, .docx, .pdf) and vector embedding
+- **Conversational AI** with context-aware responses
+- **Session history persisted in PostgreSQL** (viewable in pgAdmin)
+- **ChromaDB** for semantic search
+- **Easy to extend** with new endpoints, models, or services
 
-## Project Structure
+---
+
+## Directory Structure
 ```
 llm-chatbot-new/
-├── ingest_docs.py        # Script to ingest and embed documents
-├── conv_chatbot.py       # Main conversational chatbot script
-├── models/               # (gitignored) LLM and embedding models
-├── sops/                 # (gitignored) Standard operating procedures or sensitive docs
-├── chroma/               # (gitignored) ChromaDB persistence directory
-├── .gitignore            # Git ignore rules
-└── README.md             # This file
+├── app/
+│   ├── api/v1/endpoints/      # All route definitions
+│   ├── core/                  # Config, startup
+│   ├── db/                    # DB session, base
+│   ├── models/                # SQLAlchemy models
+│   ├── schemas/               # Pydantic schemas
+│   ├── services/              # Business logic
+│   └── main.py                # FastAPI entry point
+├── chroma/                    # ChromaDB persistence
+├── sops/                      # Ingested documents
+├── .envtemplate               # Environment variable template
+├── requirements.txt           # Python dependencies
+├── README.md                  # This file
+└── ...                        # (other legacy files/folders)
 ```
 
-## Setup Instructions
+---
 
-### 1. Clone the Repository
-```bash
-git clone <your-repo-url>
-cd llm-chatbot-new
+## Environment Variables (.env)
+Copy `.envtemplate` to `.env` and fill in your values:
+```
+DATABASE_URL=postgresql://username:password@localhost:5432/yourdb
+DATA_DIR=./data
+DB_DIR=./chroma
+EMBEDDING_MODEL_PATH=./models/all-MiniLM-L6-v2
+LLM_MODEL_PATH=./models/llama-2-7b-chat
 ```
 
-### 2. Create and Activate a Virtual Environment
-```bash
-python -m venv env
-# On Windows:
-env\Scripts\activate
-# On Linux/Mac:
-source env/bin/activate
-```
+---
 
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-*If `requirements.txt` is missing, install manually:*
-```bash
-pip install langchain langchain-community chromadb sentence-transformers torch python-docx
-```
+## Database Setup
+1. **Start PostgreSQL** and create your database (e.g., `conversation_chatbot`).
+2. **Create the chat_sessions table** (in pgAdmin or psql):
+   ```sql
+   CREATE TABLE chat_sessions (
+       id SERIAL PRIMARY KEY,
+       session_id VARCHAR(255) NOT NULL,
+       user_message TEXT NOT NULL,
+       bot_message TEXT NOT NULL,
+       timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   );
+   ```
+3. Or, run the SQLAlchemy table creation script (see project instructions).
 
-### 4. Download or Place Your LLM and Embedding Models
-- Place your local LLM and embedding models in the `models/` directory (see your `conv_chatbot.py` and `ingest_docs.py` for model path variables).
+---
 
-### 5. Ingest Documents
-Place your `.docx` or `.txt` files in the data directory (as configured in your scripts), then run:
-```bash
-python ingest_docs.py
-```
+## Installation & Running
+1. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Run the app:**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+3. **Access the API docs:**
+   - [http://localhost:8000/docs](http://localhost:8000/docs)
 
-### 6. Start the Conversational Bot
-```bash
-python conv_chatbot.py
-```
+---
 
-## Usage
-- Interact with the bot in your terminal.
-- Type your questions; the bot will answer using the ingested documents.
-- Type `exit` to quit the chatbot.
+## API Endpoints
+- `POST /api/v1/chat` — Chat with the bot (session-aware)
+- `POST /api/v1/ingest` — Ingest a document
+- `POST /api/v1/delete_doc` — Delete a document and its embedding
+- `GET  /api/v1/list_docs` — List all ingested documents
 
-## Troubleshooting & Notes
-- **Deprecation Warnings:**
-  - `HuggingFaceEmbeddings` and `Chroma` are deprecated in recent LangChain versions. For long-term use, migrate to `langchain-huggingface` and `langchain-chroma` packages.
-  - See [LangChain migration guide](https://python.langchain.com/docs/versions/migrating_memory/) for updating memory usage.
-- **Model Loading:**
-  - Ensure your model paths are correct and models are compatible with your hardware (CPU/GPU).
-- **Document Support:**
-  - Only `.docx` and `.txt` files are supported by default. Extend `ingest_docs.py` to add more types.
-- **Vector DB Persistence:**
-  - The `chroma/` directory stores your vector database and is gitignored by default.
+---
 
+## Notes
+- **Session history is now persistent in PostgreSQL.**
+- **ChromaDB** stores vector embeddings in the `chroma/` directory.
+- **Ingested documents** are stored in the `sops/` directory.
+- **Legacy files** (`main_api.py`, `chatbot_api.py`, `conv_chatbot.py`, `ingest_docs.py`) are no longer used.
 
+---
 
-## Acknowledgements
-- [LangChain](https://github.com/langchain-ai/langchain)
-- [ChromaDB](https://www.trychroma.com/)
-- [HuggingFace Transformers](https://huggingface.co/)
-- [Llama.cpp](https://github.com/ggerganov/llama.cpp) (if using local LLM) 
+## Extending
+- Add new endpoints in `app/api/v1/endpoints/`
+- Add new business logic in `app/services/`
+- Add new models in `app/models/`
+
+---
+
+## License
+MIT (or specify your own) 
