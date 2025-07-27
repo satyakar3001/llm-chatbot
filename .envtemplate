@@ -1,0 +1,19 @@
+# .envtemplate for Conversational Document-Aware Chatbot
+
+# Directory containing your data/documents to ingest
+DATA_DIR=./data
+
+# Directory for ChromaDB persistence
+DB_DIR=./chroma
+
+# Path to your embedding model (e.g., sentence-transformers or HuggingFace model)
+EMBEDDING_MODEL_PATH=./models/all-MiniLM-L6-v2
+
+# Path to your local LLM model (if used)
+LLM_MODEL_PATH=./models/llama-2-7b-chat
+
+# (Optional) API keys for cloud LLMs (if using OpenAI, etc.)
+# OPENAI_API_KEY=your-openai-api-key
+
+# (Optional) Other settings
+# LOG_LEVEL=INFO 
