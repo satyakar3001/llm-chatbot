@@ -42,8 +42,6 @@ def load_config():
         }
 
 
-
-
 # --- MODEL LOADING ---
 def load_models():
     print("Loading embedding model (offline)...")

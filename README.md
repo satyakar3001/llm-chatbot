@@ -77,8 +77,7 @@ python conv_chatbot.py
 - **Vector DB Persistence:**
   - The `chroma/` directory stores your vector database and is gitignored by default.
 
-## License
-MIT License (or specify your own)
+
 
 ## Acknowledgements
 - [LangChain](https://github.com/langchain-ai/langchain)
