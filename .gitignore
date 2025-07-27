@@ -119,5 +119,5 @@ Desktop.ini
 
 # Project-specific
 # Add your own below as needed 
-models/
-sops/ 
+models_/
+# sops/ 
